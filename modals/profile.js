@@ -58,7 +58,7 @@ const ProfileSchema = new mongoose.Schema({
             },
         }
     ],
-        socials: {
+        social: {
             youtube:{
                 type: String,
             },
@@ -68,7 +68,7 @@ const ProfileSchema = new mongoose.Schema({
             facebook:{
                 type: String,
             },
-            linkedin:{
+            linkedin:{ 
                 type: String,
             },
             instagram:{
