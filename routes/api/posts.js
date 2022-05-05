@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
+const req = require('express/lib/request');
+const res = require('express/lib/response');
 const auth = require("../../middleware/auth");
 const Post = require("../../modals/post");
 const Profile = require('../../modals/profile');
@@ -109,5 +111,58 @@ router.delete('/:id', auth, async (req,res) => {
          res.status(500).send('Server Error')
     }
 });
+
+// PUT api/posts/like/:id
+// private
+// like posts
+
+router.put('/like/:id', auth, async (req, res) => {
+try {
+    const post = await Post.findById(req.params.id);
+
+    if(post.likes.filter(like => like.user.toString() === req.user.id).length > 0){
+        return res.status(400).json({ msg: 'Post already liked.'})
+    }
+
+    post.likes.unshift({ user: req.user.id });
+
+    await post.save();
+
+    res.json(post.likes);
+    
+} catch (error) {
+    console.error(error.message);
+     res.status(500).send('Server Error')
+}
+});
+
+// PUT api/posts/unlike/:id
+// private
+// like posts
+
+router.put('/unlike/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+    
+        if(post.likes.filter(like => like.user.toString() === req.user.id).length === 0){
+            return res.status(400).json({ msg: 'Post has noy yet been liked.'})
+        }
+    
+        const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id);
+
+        post.likes.splice(removeIndex, 1);
+    
+        await post.save();
+    
+        res.json(post.likes);
+        
+    } catch (error) {
+        console.error(error.message);
+         res.status(500).send('Server Error')
+    }
+    });
+    
+
+
 
 module.exports = router;
